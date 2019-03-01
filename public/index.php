@@ -3,16 +3,13 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-require '../vendor/autoload.php';
-require '../src/config/database.php';
-require '../src/helpers/validate.php';
+require_once '../vendor/autoload.php';
+require_once '../app/config/config.php';
+require_once '../app/helpers/database.php';
+require_once '../app/helpers/validate.php';
 
-$app = new \Slim\App(['settings' => [
-	'displayErrorDetails' => true,
-	'error_reporting' => true
-	]
-]);
+$app = new \Slim\App;
 
-require '../src/routes/customers.php';
+require_once '../app/routes/users.php';
 
 $app->run();

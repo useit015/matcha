@@ -1,11 +1,11 @@
 <?php
 
 class Database {
-	private $name = 'slim';
-	private $host = '172.18.0.2';
-	private $port = 3306;
-	private $user = 'root';
-	private $pass = 'root';
+	private $name = DB_NAME;
+	private $host = DB_HOST;
+	private $port = DB_PORT;
+	private $user = DB_USER;
+	private $pass = DB_PASS;
 	private $dbh;
 	private $stmt;
 	private $err;
@@ -15,11 +15,11 @@ class Database {
 			PDO::ATTR_PERSISTENT => true,
 			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 		];
-		$dsn = 'mysql:host='.$this->host.';port='.$this->port.';dbname='.$this->name;
+		$dsn = 'mysql:host=' . $this->host . ';port=' . $this->port . ';dbname=' . $this->name;
 		try {
 			$this->dbh = new PDO($dsn, $this->user, $this->pass, $options);
 		} catch (PDOException $e) {
-			die('{"error": {"text": '.$e->getMessage().'}}');
+			die('{"error": {"text": ' . $e->getMessage() . '}}');
 		}
 	}
 
@@ -50,8 +50,8 @@ class Database {
 		return $this->stmt->execute($data);
 	}
 
-	public function resultSet() {
-		$this->execute();
+	public function resultSet($data) {
+		$this->execute($data);
 		return $this->stmt->fetchAll(PDO::FETCH_OBJ);
 	}
 

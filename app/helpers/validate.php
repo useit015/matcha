@@ -1,4 +1,5 @@
 <?php
+
 class Validator {
 	public function validatePassword($password) {
 		if (empty($password)) {
@@ -11,6 +12,7 @@ class Validator {
 			return '';
 		}
 	}
+
 	public function validateEmail($email) {
 		if (empty($email)) {
 			return 'Email shall not be empty';
@@ -20,6 +22,7 @@ class Validator {
 			return '';
 		}
 	}
+
 	public function validateName($name, $genre) {
 		if (empty($name)) {
 			return $genre.' name shall not be empty';
@@ -29,6 +32,7 @@ class Validator {
 			return '';
 		}
 	}
+
 	public function validateConfirmPassword($password, $confPassword) {
 		if (empty($confPassword)) {
 			return 'Please confirm your password';
@@ -38,24 +42,27 @@ class Validator {
 			return '';
 		}
 	}
+
 	public function validateExistingPassword($password) {
 		if (empty($password)) {
 			return 'Password shall not be empty';
-		} elseif (!$this->userModel->login($_SESSION['user_email'], $password)) {
-			return 'Wrong password';
+		// } elseif (!$this->userModel->login($_SESSION['user_email'], $password)) {
+		// 	return 'Wrong password';
 		} else {
 			return '';
 		}
 	}
+
 	public function loginValidateEmail($email) {
 		if (empty($email)) {
 			return 'Email shall not be empy';
-		} elseif (!$this->userModel->findUserByEmail($email)) {
-			return 'No user found';
+		// } elseif (!$this->userModel->findUserByEmail($email)) {
+		// 	return 'No user found';
 		} else {
 			return '';
 		}
 	}
+
 	public function loginValidatePassword($password) {
 		if (empty($password)) {
 			return 'Password shall not be empy';
