@@ -5,8 +5,8 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 $app = new \Slim\App;
 
-$app->options('/{routes:.+}', function ($req, $res, $args) {
-	return $res;
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+	return $response;
 });
 
 $app->add(function ($req, $res, $next) {
@@ -14,24 +14,22 @@ $app->add(function ($req, $res, $next) {
 	return $response
 			->withHeader('Access-Control-Allow-Origin', '*')
 			->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-			->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+			->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 });
 
 $app->get('/api/users', function(Request $req, Response $res) {
-	$db = new Database();
-	$db->query('SELECT * FROM users');
-	echo json_encode($db->resultSet([]));
+	$userModel = new User();
+	echo json_encode($userModel->getAllUsers());
 });
 
 $app->get('/api/user/{id}', function(Request $req, Response $res) {
-	$db = new Database();
-	$db->query('SELECT * FROM users WHERE id = ?');
-	$row = $db->single([$req->getAttribute('id')]);
-	echo json_encode($row ? [$row] : []);
+	$userModel = new User();
+	echo json_encode($userModel->getUser($req->getAttribute('id')));
 });
 
 $app->post('/api/user/add', function(Request $req, Response $res) {
-	$val = new Validator();
+	$userModel = new User();
+	$validator = new Validator();
 	$data = [
 		'first_name' => $req->getParam('first_name'),
 		'last_name' => $req->getParam('last_name'),
@@ -41,43 +39,52 @@ $app->post('/api/user/add', function(Request $req, Response $res) {
 		'vkey' => bin2hex(random_bytes(10))
 	];
 	$err = [
-		'username' => $val->validateName($data['username'], 'User'),
-		'password' => $val->validatePassword($data['password']),
-		'email' => $val->validateEmail($data['email'])
+		'username' => $validator->validateName($data['username'], 'User'),
+		'password' => $validator->validatePassword($data['password']),
+		'email' => $validator->validateEmail($data['email'])
 	];
-	if (!empty($err['username']) || !empty($err['password']) || !empty($err['email']))
-		die(json_encode(['response' => $err, 'errors' => true]));
-	$db = new Database();
-	$data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-	$db->query('INSERT INTO users
-					(first_name, last_name, username, email, `password`, vkey)
-				VALUES
-					(:first_name, :last_name, :username, :email, :password, :vkey)');
-	if ($db->execute($data)) {
-		mail($data['email'], 'Mail verification','http://localhost/matcha/public/api/user/verify/' . $data['vkey']);
-		echo json_encode(['response' => $data, 'errors' => false]);
-	} else
-		echo json_encode([]);
+	$res = [
+		'response' => $data,
+		'err' => '',
+		'ok' => true
+	];
+	if (empty($err['username']) && empty($err['password']) && empty($err['email'])) {
+		$data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+		if ($userModel->addUser($data)) {
+			mail($data['email'], 'Mail verification','http://localhost/matcha/public/api/user/verify/' . $data['vkey']);
+		} else {
+			$res['err'] = ['server' => 'Cant add user ..'];
+			$res['ok'] = false;
+		}
+	} else {
+		$res['err'] = $err;
+		$res['ok'] = false;
+	}
+	echo json_encode($res);
 });
 
 $app->get('/api/user/verify/{vkey}', function(Request $req, Response $res) {
+	$userModel = new User();
 	$vkey = $req->getAttribute('vkey');
-	$db = new Database();
-	$db->query('SELECT verified FROM users WHERE vkey = ?');
-	$row = $db->single([$vkey]);
+	$row = $userModel->isVerified($vkey);
+	$res = ['ok' => true];
 	if ($row) {
-		if ($row->verified == 1)
-			die('Already verified');
-	} else
-		die('Oups! Something went wrong.');
-	$db->query('UPDATE users SET verified = 1 WHERE vkey = ? AND verified = 0');
-	if ($db->execute([$vkey]))
-		echo 'done';
-	else
-		echo 'none';
+		if (!$userModel->verifyUser($vkey)) {
+			$res['ok'] = false;
+			if ($row->verified == 1)
+				$res['err'] = 'Already verified';
+			else
+				$res['err'] = 'Cant verify';
+		}
+	} else {
+		$res['ok'] = false;
+		$res['err'] = 'User not found';
+	}
+	echo json_encode($res);
 });
 
 $app->post('/api/user/update/{id}', function(Request $req, Response $res) {
+	$userModel = new User();
 	$data = [
 		'id' => $req->getAttribute('id'),
 		'first_name' => $req->getParam('first_name'),
@@ -91,39 +98,39 @@ $app->post('/api/user/update/{id}', function(Request $req, Response $res) {
 		'address' => $req->getParam('address'),
 		'phone' => $req->getParam('phone')
 	];
-	$db = new Database();
-	$db->query('SELECT * FROM users WHERE id = ?');
-	$db->execute([$data['id']]);
-	if (!$db->rowCount())
-		die(json_encode([]));
-	$db->query('UPDATE users SET
-					first_name = :first_name,
-					last_name = :last_name,
-					username = :username,
-					email = :email,
-					gender = :gender,
-					sex_preference = :sex_preference,
-					biography = :biography,
-					tags = :tags,
-					`address` = :address,
-					phone = :phone
-				WHERE id = :id');
-	if ($db->execute($data))
-		echo json_encode($data);
-	else
-		echo json_encode([]);
-	});
+	$res = [
+		'response' => $data,
+		'err' => '',
+		'ok' => true
+	];
+	if ($userModel->isUser($data['id'])) {
+		if (!$userModel->updateUser($data)) {
+			$res['ok'] = false;
+			$res['err'] = 'Cant update';
+		}
+	} else {
+		$res['ok'] = false;
+		$res['err'] = 'User not found';
+	}
+	echo json_encode($res);
+});
 
 $app->post('/api/user/delete/{id}', function(Request $req, Response $res) {
+	$userModel = new User();
 	$id = $req->getAttribute('id');
-	$db = new Database();
-	$db->query('SELECT * FROM users WHERE id = ?');
-	$db->execute([$id]);
-	if (!$db->rowCount())
-		die(json_encode([]));
-	$db->query('DELETE FROM users WHERE id = ?');
-	if ($db->execute([$id]))
-		echo json_encode($id);
-	else
-		echo json_encode([]);
+	if ($userModel->isUser($id)) {
+		if (!$userModel->deleteUser($id)) {
+			$res['ok'] = false;
+			$res['err'] = 'Cant delete';
+		}
+	} else {
+		$res['ok'] = false;
+		$res['err'] = 'User not found';
+	}
+	echo json_encode($res);
+});
+
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
+	$handler = $this->notFoundHandler; // handle using the default Slim page not found handler
+	return $handler($req, $res);
 });

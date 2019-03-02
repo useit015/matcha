@@ -28,40 +28,60 @@ class Database {
 	}
 
 	public function bind($param, $value, $type = null) {
-		if (is_null($type)) {
-			switch ($true) {
-				case is_int($value):
-					$type = PDO::PARAM_INT;
-					break;
-				case is_bool($value):
-					$type = PDO::PARAM_BOOL;
-					break;
-				case is_null($value):
-					$type = PDO::PARAM_NULL;
-					break;
-				default:
-					$type = PDO::PARAM_STR;
+		try {
+			if (is_null($type)) {
+				switch ($true) {
+					case is_int($value):
+						$type = PDO::PARAM_INT;
+						break;
+					case is_bool($value):
+						$type = PDO::PARAM_BOOL;
+						break;
+					case is_null($value):
+						$type = PDO::PARAM_NULL;
+						break;
+					default:
+						$type = PDO::PARAM_STR;
+				}
 			}
+			$this->stmt->bindValue($param, $value, $type);
+		} catch (PDOException $e) {
+			die('{"error": {"text": ' . $e->getMessage() . '}}');
 		}
-		$this->stmt->bindValue($param, $value, $type);
 	}
 
 	public function execute($data) {
-		return $this->stmt->execute($data);
+		try {
+			return $this->stmt->execute($data);
+		} catch (PDOException $e) {
+			die('{"error": {"text": ' . $e->getMessage() . '}}');
+		}
 	}
-
+	
 	public function resultSet($data) {
-		$this->execute($data);
-		return $this->stmt->fetchAll(PDO::FETCH_OBJ);
+		try {
+			$this->execute($data);
+			return $this->stmt->fetchAll(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			die('{"error": {"text": ' . $e->getMessage() . '}}');
+		}
 	}
 
 	public function single($data) {
-		$this->execute($data);
-		return $this->stmt->fetch(PDO::FETCH_OBJ);
+		try {
+			$this->execute($data);
+			return $this->stmt->fetch(PDO::FETCH_OBJ);
+		} catch (PDOException $e) {
+			die('{"error": {"text": ' . $e->getMessage() . '}}');
+		}
 	}
 
 	public function rowCount() {
-		return $this->stmt->rowCount();
+		try {
+			return $this->stmt->rowCount();
+		} catch (PDOException $e) {
+			die('{"error": {"text": ' . $e->getMessage() . '}}');
+		}
 	}
 }
 
