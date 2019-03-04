@@ -1,0 +1,33 @@
+:root {
+	--color-primary: #2196F3;
+	--color-accent: #1976D2;
+	--color-white: #FFF;
+	--color-black: #111;
+	--color-grey-light: #f3f3f3;
+	--color-grey-dark: #575757;
+	--color-green: #00ad53;
+	--color-red: #ff0015;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+*,
+ *::after, *::before {
+	box-sizing: inherit;
+}
+
+html {
+	box-sizing: border-box;;
+}
+
+body {
+	/* background: var(--color-grey-light); */
+}
+
+::selection {
+	background-color: var(--accent-color);
+	color: var(--white-color);
+}

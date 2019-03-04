@@ -12,14 +12,16 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
 $app->add(function ($req, $res, $next) {
 	$response = $next($req, $res);
 	return $response
-			->withHeader('Access-Control-Allow-Origin', '*')
+			->withHeader('Access-Control-Allow-Origin','http://localhost:8080')
 			->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
 			->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 });
 
 $app->get('/api/users', function(Request $req, Response $res) {
 	$userModel = new User();
-	echo json_encode($userModel->getAllUsers());
+	return $res
+			->withJson($userModel->getAllUsers())
+			->withHeader('Content-type', 'application/json');
 });
 
 $app->get('/api/user/{id}', function(Request $req, Response $res) {
@@ -51,7 +53,7 @@ $app->post('/api/user/add', function(Request $req, Response $res) {
 	if (empty($err['username']) && empty($err['password']) && empty($err['email'])) {
 		$data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
 		if ($userModel->addUser($data)) {
-			mail($data['email'], 'Mail verification','http://localhost/matcha/public/api/user/verify/' . $data['vkey']);
+			// mail($data['email'], 'Mail verification','http://localhost/matcha/public/api/user/verify/' . $data['vkey']);
 		} else {
 			$res['err'] = ['server' => 'Cant add user ..'];
 			$res['ok'] = false;
