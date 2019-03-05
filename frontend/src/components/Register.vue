@@ -1,63 +1,67 @@
 <template>
-	<div class="container">
+	<v-container>
 		<transition name="alert">
-			<v-alert v-if="userFailed" :value="true" dismissible type="error" color="error" icon="warning" transition="scale-transition">
+			<v-alert v-if="userFailed" :value="true" dismissible type="error" color="error" icon="warning" transition="scale-transition" class="alert">
 				Oups .. something went wrong !
 			</v-alert>
-			<v-alert v-if="userAdded" :value="true" dismissible type="success" color="success" icon="check_circle" transition="scale-transition">
+			<v-alert v-if="userAdded" :value="true" dismissible type="success" color="success" icon="check_circle" transition="scale-transition" class="alert">
 				You have been successfully registered, please verify your email
 			</v-alert>
 		</transition>
-		<div class="register container d-flex align-items-center justify-content-center my-5">
-			<div class="card col-md-7 p-5">
-				<div class="card-body">
-					<h1 class="page-header text-center display-2 mb-4">Register</h1>
-					<v-form v-model="valid">
-						<v-text-field v-model="firstname" :rules="nameRules" label="First name" required ></v-text-field>
-						<v-text-field v-model="lastname" :rules="nameRules" label="Last name" required ></v-text-field>
-						<v-text-field v-model="username" :rules="usernameRules" :counter="10" label="Username" required ></v-text-field>
-						<v-text-field v-model="password" :type="'password'" :counter="12" :rules="passRules" label="Password" required ></v-text-field>
-						<v-text-field v-model="email" :rules="emailRules" label="E-mail" required ></v-text-field>
-						<v-btn @click="submit">Submit</v-btn>
-						<!-- <v-btn @click="clear">Clear</v-btn> -->
-					</v-form>
-				</div>
-			</div>
+		<div class="register">
+			<h1 class="page-header display-3 mb-4 font-weight-light grey--text">Register</h1>
+			<v-form v-model="valid" class="my-4">
+				<v-text-field color="indigo" class="my-3" v-model="firstname" :rules="rules.name" label="First name" required ></v-text-field>
+				<v-text-field color="indigo" class="my-3" v-model="lastname" :rules="rules.name" label="Last name" required ></v-text-field>
+				<v-text-field color="indigo" class="my-3" v-model="username" :rules="rules.username" :counter="10" label="Username" required ></v-text-field>
+				<v-text-field color="indigo" class="my-3" v-model="email" :rules="rules.email" label="E-mail" required ></v-text-field>
+				<v-text-field color="indigo" class="my-3" v-model="password" :counter="12" :rules="rules.password" label="Password" required :append-icon="showPass ? 'visibility' : 'visibility_off'" :type="showPass ? 'text' : 'password'" @click:append="showPass = !showPass"></v-text-field>
+				<v-text-field color="indigo" class="my-3" v-model="passwordConfirm" :counter="12" label="Confirm Password" required :append-icon="showConfPass ? 'visibility' : 'visibility_off'" :type="showConfPass ? 'text' : 'password'" @click:append="showConfPass = !showConfPass" :error-messages='passwordMatch()'></v-text-field>
+				<v-btn block large depressed color="indigo" dark @click="registerUser" class="mt-5">Submit</v-btn>
+				<v-layout row justify-end>
+					<v-btn flat color="indigo" dark to="/login">Have an account? Login</v-btn>
+				</v-layout>
+			</v-form>
 		</div>
-	</div>
+	</v-container>
 </template>
 
 <script>
 export default {
 	name: 'Register',
 	data: () => ({
-		valid: false,
 		firstname: '',
 		lastname: '',
 		username: '',
 		password: '',
+		passwordConfirm: '',
 		email: '',
+		valid: false,
+		showPass: false,
+		showConfPass: false,
 		userAdded: false,
 		userFailed: false,
-		nameRules: [
-			v => !!v || 'This field is required'
-		],
-		usernameRules: [
-			v => !!v || 'This field is required',
-			v => v.length <= 10 || 'Username must be less than 10 characters'
-		],
-		emailRules: [
-			v => !!v || 'This field is required',
-			v => /.+@.+/.test(v) || 'E-mail must be valid'
-		],
-		passRules: [
-			v => !!v || 'This field is required',
-			v => /^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]+$/.test(v) || 'Password must contain at least one letter, one number and one special char',
-			v => (v.length >= 8 && v.length <= 12) || 'Password must be between 8 and 12 characters long'
-		]
+		rules: {
+			name: [
+				v => !!v || 'This field is required'
+			],
+			username: [
+				v => !!v || 'This field is required',
+				v => v.length <= 10 || 'Username must be less than 10 characters'
+			],
+			email: [
+				v => !!v || 'This field is required',
+				v => /.+@.+/.test(v) || 'E-mail must be valid'
+			],
+			password: [
+				v => !!v || 'This field is required',
+				v => /^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]+$/.test(v) || 'Password must contain at least one letter, one number and one special char',
+				v => (v.length >= 8 && v.length <= 12) || 'Password must be between 8 and 12 characters long'
+			]
+		}
 	}),
 	methods: {
-		submit(e) {
+		registerUser(e) {
 			e.preventDefault()
 			this.$http.post('http://localhost:80/matcha/public/api/user/add', {
 				first_name: this.firstname,
@@ -75,21 +79,15 @@ export default {
 					setTimeout(() => this.userFailed = false, 5000)
 				}
 			}).catch(err => console.error(err))
+		},
+		passwordMatch () { 
+			return this.password === this.passwordConfirm ? '' : 'Passwords must match';
 		}
 	}
 }
 </script>
 
 <style>
-	.error--text, .theme--light.v-messages.error--text, .v-messages__message {
-		color: red !important;
-	}
-	.v-alert.success {
-		background: #4DAF50;
-	}
-	.v-alert.error {
-		background: #FF5252;
-	}
 	.alert-enter-active, .alert-leave-active, .register {
 		transition: all .5s;
 	}
@@ -101,9 +99,15 @@ export default {
 					0 5px 15px 0 rgba(0,0,0,0.08);
 		text-align: center;
 	}
-	.card-body {
+	.register, .alert {
 		width: 100%;
 		max-width: 40rem;
 		margin: auto;
+	}
+	.alert {
+		position: absolute;
+		left: 50%;
+		top: -5rem;
+		transform: translate(-50%, -0%);
 	}
 </style>

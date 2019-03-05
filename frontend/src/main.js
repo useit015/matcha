@@ -3,8 +3,10 @@ import App from './App'
 import Vuetify from 'vuetify'
 import vueRouter from 'vue-router'
 import vueResource from 'vue-resource'
+import Navbar from '@/components/Navbar'
 import Users from '@/components/Users'
 import About from '@/components/About'
+import Login from '@/components/Login'
 import Register from '@/components/Register'
 import 'vuetify/dist/vuetify.min.css'
 
@@ -13,6 +15,8 @@ Vue.use(vueRouter)
 Vue.use(vueResource)
 
 const router = new vueRouter({
+	mode: 'history',
+	base: process.env.BASE_URL,
 	routes: [
 		{
 			path: '/',
@@ -25,14 +29,20 @@ const router = new vueRouter({
 		{
 			path: '/register',
 			component: Register
+		},
+		{
+			path: '/login',
+			component: Login
 		}
 	]
 })
 
 new Vue({
 	router,
+	components: { Navbar },
 	template: `
-		<div id="app">
+		<v-app class="grey lighten-4">
+			<Navbar/>
 			<div class="bg-white mb-3 border-bottom shadow-sm">
 				<div class="p-3 px-md-4 container d-flex flex-column flex-md-row align-items-center">
 					<h5 class="my-0 mr-md-auto font-weight-normal">Matcha</h5>
@@ -43,7 +53,9 @@ new Vue({
 					<router-link class="btn btn-outline-primary" to="/register">Sign up</router-link>
 				</div>
 			</div>
-			<router-view></router-view>
-		</div>
+			<v-content>
+				<router-view></router-view>
+			</v-content>
+		</v-app>
 	`
 }).$mount('#app')

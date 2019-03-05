@@ -5,23 +5,20 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 $app = new \Slim\App;
 
-$app->options('/{routes:.+}', function ($request, $response, $args) {
-	return $response;
-});
-
-$app->add(function ($req, $res, $next) {
-	$response = $next($req, $res);
-	return $response
-			->withHeader('Access-Control-Allow-Origin','http://localhost:8080')
-			->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-			->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+$app->post('/api/user/login', function(Request $req, Response $res) {
+	$userModel = new User();
+	$loggedIn = $userModel->login($req->getParam('username'), $req->getParam('password'));
+	if ($loggedIn) {
+		unset($loggedIn->password);
+		unset($loggedIn->vkey);
+		unset($loggedIn->verified);
+	}
+	return $res->withJson($loggedIn ? $loggedIn : []);
 });
 
 $app->get('/api/users', function(Request $req, Response $res) {
 	$userModel = new User();
-	return $res
-			->withJson($userModel->getAllUsers())
-			->withHeader('Content-type', 'application/json');
+	return $res->withJson($userModel->getAllUsers());
 });
 
 $app->get('/api/user/{id}', function(Request $req, Response $res) {
@@ -130,9 +127,4 @@ $app->post('/api/user/delete/{id}', function(Request $req, Response $res) {
 		$res['err'] = 'User not found';
 	}
 	echo json_encode($res);
-});
-
-$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
-	$handler = $this->notFoundHandler; // handle using the default Slim page not found handler
-	return $handler($req, $res);
 });

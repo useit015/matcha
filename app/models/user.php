@@ -7,6 +7,15 @@ class User {
 		$this->db = new Database();
 	}
 
+	public function login($username, $password) {
+		$this->db->query('SELECT * FROM users WHERE username = ? AND verified = 1');
+		$row = $this->db->single([$username]);
+		if (password_verify($password, $row->password))
+			return $row;
+		else
+			return false;
+	}
+
 	public function getAllUsers() {
 		$this->db->query('SELECT * FROM users');
 		return $this->db->resultSet([]);

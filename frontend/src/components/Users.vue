@@ -1,12 +1,18 @@
 <template>
-	<div class="users container">
-		<h1 class="page-header">All users</h1>
-		<ul>
-			<li v-for="user in users">
-				{{ user }}
-			</li>
-		</ul>
-	</div>
+	<v-container>
+		<div class="users">
+			<h1 class="page-header">All users</h1>
+			<v-layout row wrap>
+				<v-flex xs12 md6 class="py-2" v-for="user in users" :key="user.id">
+					{{ user }}
+				</v-flex>
+			</v-layout>
+			<!-- <ul>
+				<li v-for="user in users" :key="user.id">
+				</li>
+			</ul> -->
+		</div>
+	</v-container>
 </template>
 
 <script>
