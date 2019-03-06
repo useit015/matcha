@@ -1,14 +1,14 @@
 <template>
-	<v-container>
+	<v-container class="mt-4">
 		<transition name="alert">
-			<v-alert v-if="userFailed" :value="true" dismissible type="error" color="error" icon="warning" transition="scale-transition">
+			<v-alert v-if="userFailed" :value="true" dismissible type="error" color="error" icon="warning" transition="scale-transition" class="alert">
 				Oups .. something went wrong !
 			</v-alert>
-			<v-alert v-if="userAdded" :value="true" dismissible type="success" color="success" icon="check_circle" transition="scale-transition">
+			<v-alert v-if="userAdded" :value="true" dismissible type="success" color="success" icon="check_circle" transition="scale-transition" class="alert">
 				You have been successfully registered, please verify your email
 			</v-alert>
 		</transition>
-		<div class="login">
+		<div class="login mt-5">
 			<h1 class="page-header display-3 font-weight-light grey--text">Login</h1>
 			<v-form v-model="valid" class="my-4">
 				<v-text-field color="indigo" class="my-5" v-model="username" :rules="usernameRules" label="Username" required ></v-text-field>
@@ -56,7 +56,10 @@ export default {
 				username: this.username,
 				password: this.password
 			}).then(res => {
-				console.log(res.body);
+				if (res.body.tokenExpiration && Date.parse(res.body.tokenExpiration) >= Date.now()) {
+					this.$store.dispatch('login', res.body)
+					this.$router.push('/')
+				}
 			}).catch(err => console.error(err))
 		}
 	}
@@ -70,14 +73,15 @@ export default {
 	.alert-enter, .alert-leave-to {
 		opacity: 0;
 	}
-	.register>.card {
-		box-shadow: 0 15px 30px 0 rgba(0,0,0,0.11),
-					0 5px 15px 0 rgba(0,0,0,0.08);
-		text-align: center;
-	}
-	.login {
+	.login, .alert {
 		width: 100%;
 		max-width: 40rem;
 		margin: auto;
+	}
+	.alert {
+		position: absolute;
+		left: 50%;
+		top: 1rem;
+		transform: translateX(-50%);
 	}
 </style>

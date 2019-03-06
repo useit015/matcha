@@ -3,17 +3,25 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-$app = new \Slim\App;
+$app = new \Slim\App([
+	'settings' => [
+		'displayErrorDetails' => true
+	]
+]);
 
 $app->post('/api/user/login', function(Request $req, Response $res) {
 	$userModel = new User();
 	$loggedIn = $userModel->login($req->getParam('username'), $req->getParam('password'));
-	if ($loggedIn) {
-		unset($loggedIn->password);
-		unset($loggedIn->vkey);
-		unset($loggedIn->verified);
-	}
-	return $res->withJson($loggedIn ? $loggedIn : []);
+	return $res->withJson($loggedIn);
+});
+
+$app->post('/api/user/isloggedin', function(Request $req, Response $res) {
+	$userModel = new User();
+	return $res->withJson($userModel->checkToken($req->getParam('token')));
+});
+
+$app->post('/api/user/logout', function(Request $req, Response $res) {
+	return $res->withJson(['ok' => true]);
 });
 
 $app->get('/api/users', function(Request $req, Response $res) {

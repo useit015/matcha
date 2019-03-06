@@ -1,5 +1,5 @@
 <template>
-	<v-container>
+	<v-container class="mt-4">
 		<transition name="alert">
 			<v-alert v-if="userFailed" :value="true" dismissible type="error" color="error" icon="warning" transition="scale-transition" class="alert">
 				Oups .. something went wrong !
@@ -8,7 +8,7 @@
 				You have been successfully registered, please verify your email
 			</v-alert>
 		</transition>
-		<div class="register">
+		<div class="register mt-5">
 			<h1 class="page-header display-3 mb-4 font-weight-light grey--text">Register</h1>
 			<v-form v-model="valid" class="my-4">
 				<v-text-field color="indigo" class="my-3" v-model="firstname" :rules="rules.name" label="First name" required ></v-text-field>
@@ -16,7 +16,7 @@
 				<v-text-field color="indigo" class="my-3" v-model="username" :rules="rules.username" :counter="10" label="Username" required ></v-text-field>
 				<v-text-field color="indigo" class="my-3" v-model="email" :rules="rules.email" label="E-mail" required ></v-text-field>
 				<v-text-field color="indigo" class="my-3" v-model="password" :counter="12" :rules="rules.password" label="Password" required :append-icon="showPass ? 'visibility' : 'visibility_off'" :type="showPass ? 'text' : 'password'" @click:append="showPass = !showPass"></v-text-field>
-				<v-text-field color="indigo" class="my-3" v-model="passwordConfirm" :counter="12" label="Confirm Password" required :append-icon="showConfPass ? 'visibility' : 'visibility_off'" :type="showConfPass ? 'text' : 'password'" @click:append="showConfPass = !showConfPass" :error-messages='passwordMatch()'></v-text-field>
+				<v-text-field color="indigo" class="my-3" v-model="passwordConfirm" :counter="12" label="Confirm Password" required :append-icon="showConfPass ? 'visibility' : 'visibility_off'" :type="showConfPass ? 'text' : 'password'" @click:append="showConfPass = !showConfPass" :error-messages="passwordMatch()"></v-text-field>
 				<v-btn block large depressed color="indigo" dark @click="registerUser" class="mt-5">Submit</v-btn>
 				<v-layout row justify-end>
 					<v-btn flat color="indigo" dark to="/login">Have an account? Login</v-btn>
@@ -94,11 +94,6 @@ export default {
 	.alert-enter, .alert-leave-to {
 		opacity: 0;
 	}
-	.register>.card {
-		box-shadow: 0 15px 30px 0 rgba(0,0,0,0.11),
-					0 5px 15px 0 rgba(0,0,0,0.08);
-		text-align: center;
-	}
 	.register, .alert {
 		width: 100%;
 		max-width: 40rem;
@@ -107,7 +102,7 @@ export default {
 	.alert {
 		position: absolute;
 		left: 50%;
-		top: -5rem;
-		transform: translate(-50%, -0%);
+		top: 1rem;
+		transform: translateX(-50%);
 	}
 </style>

@@ -1,15 +1,52 @@
 <template>
-	<div id="app">
-		Test
-	</div>
+	<v-app class="grey lighten-5">
+		<Navbar/>
+		<v-content>
+			<router-view></router-view>
+		</v-content>
+	</v-app>
 </template>
 
 <script>
+import Navbar from '@/components/Navbar'
 export default {
-	name: 'App'
+	name: 'App',
+	components: { Navbar }
 }
 </script>
 
 <style>
+:root {
+	--color-primary: #3f51b5;
+	--color-accent: #354288;
+	--color-white: #FFF;
+	--color-black: #111;
+	--color-grey-light: #f3f3f3;
+	--color-grey-dark: #575757;
+	--color-green: #00ad53;
+	--color-red: #ff0015;
+}
 
+* {
+	margin: 0;
+	padding: 0;
+}
+
+*,
+ *::after, *::before {
+	box-sizing: inherit;
+}
+
+html {
+	box-sizing: border-box;
+}
+
+body {
+	background: var(--color-red);
+}
+
+::selection {
+	background-color: var(--color-primary);
+	color: var(--color-white);
+}
 </style>

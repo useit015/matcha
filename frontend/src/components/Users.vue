@@ -7,10 +7,6 @@
 					{{ user }}
 				</v-flex>
 			</v-layout>
-			<!-- <ul>
-				<li v-for="user in users" :key="user.id">
-				</li>
-			</ul> -->
 		</div>
 	</v-container>
 </template>
