@@ -20,18 +20,7 @@ class User {
 	public function login($username, $password) {
 		$this->db->query('SELECT * FROM users WHERE username = ? AND verified = 1');
 		$row = $this->db->single([$username]);
-		if (password_verify($password, $row->password)) {
-			$row->token = bin2hex(random_bytes(8));
-			$row->tokenExpiration = date('Y-m-d H:i:s', strtotime('+1 day'));
-			$this->setToken([
-				'token' => $row->token,
-				'tokenExpiration' => $row->tokenExpiration,
-				'id' => $row->id
-			]);
-			return $row;
-		}
-		else
-			return false;
+		return password_verify($password, $row->password) ? $row : false;
 	}
 
 	public function getAllUsers() {

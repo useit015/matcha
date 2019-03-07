@@ -10,7 +10,8 @@ export const store = new Vuex.Store({
 		user: {}
 	},
 	getters: {
-		
+		user: state => state.user,
+		status: state => state.status
 	},
 	mutations: {
 		logout: state => {
@@ -24,12 +25,11 @@ export const store = new Vuex.Store({
 	},
 	actions: {
 		login:(context, user) => {
-			localStorage.setItem("token", user.token)
-			localStorage.setItem("tokenExpiration", user.tokenExpiration)
+			localStorage.setItem('token', user.token)
 			context.commit('login', user)
 		},
 		logout: (context) => {
-			localStorage.removeItem("token")
+			localStorage.removeItem('token')
 			context.commit('logout')
 		}
 	}

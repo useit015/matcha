@@ -13,7 +13,7 @@
 			<v-form v-model="valid" class="my-4">
 				<v-text-field color="indigo" class="my-5" v-model="username" :rules="usernameRules" label="Username" required ></v-text-field>
 				<v-text-field color="indigo" class="my-5" v-model="password" :rules="passRules" label="Password" required :append-icon="showPass ? 'visibility' : 'visibility_off'" :type="showPass ? 'text' : 'password'" @click:append="showPass = !showPass"></v-text-field>
-				<v-btn block large depressed color="indigo" dark @click="login" class="mt-5">Login</v-btn>
+				<v-btn block large depressed color="indigo" dark @click.prevent="login" class="mt-5">Login</v-btn>
 				<v-layout row justify-end>
 					<v-btn flat color="indigo" dark to="/register">Don't have an account? Sign up</v-btn>
 				</v-layout>
@@ -50,8 +50,7 @@ export default {
 		]
 	}),
 	methods: {
-		login(e) {
-			e.preventDefault()
+		login() {
 			this.$http.post('http://localhost:80/matcha/public/api/user/login', {
 				username: this.username,
 				password: this.password

@@ -12,12 +12,31 @@ $app = new \Slim\App([
 $app->post('/api/user/login', function(Request $req, Response $res) {
 	$userModel = new User();
 	$loggedIn = $userModel->login($req->getParam('username'), $req->getParam('password'));
+	if ($loggedIn) {
+		$loggedIn->token = bin2hex(random_bytes(8));
+		$loggedIn->tokenExpiration = date('Y-m-d H:i:s', strtotime('+2 hour'));
+		$userModel->setToken([
+			'token' => $loggedIn->token,
+			'tokenExpiration' => $loggedIn->tokenExpiration,
+			'id' => $loggedIn->id
+		]);
+	}
 	return $res->withJson($loggedIn);
 });
 
 $app->post('/api/user/isloggedin', function(Request $req, Response $res) {
 	$userModel = new User();
-	return $res->withJson($userModel->checkToken($req->getParam('token')));
+	$loggedIn = $userModel->checkToken($req->getParam('token'));
+	if ($loggedIn) {
+		$loggedIn->token = bin2hex(random_bytes(8));
+		$loggedIn->tokenExpiration = date('Y-m-d H:i:s', strtotime('+2 hour'));
+		$userModel->setToken([
+			'token' => $loggedIn->token,
+			'tokenExpiration' => $loggedIn->tokenExpiration,
+			'id' => $loggedIn->id
+		]);
+	}
+	return $res->withJson($loggedIn);
 });
 
 $app->post('/api/user/logout', function(Request $req, Response $res) {
@@ -58,7 +77,7 @@ $app->post('/api/user/add', function(Request $req, Response $res) {
 	if (empty($err['username']) && empty($err['password']) && empty($err['email'])) {
 		$data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
 		if ($userModel->addUser($data)) {
-			// mail($data['email'], 'Mail verification','http://localhost/matcha/public/api/user/verify/' . $data['vkey']);
+			mail($data['email'], 'Mail verification','http://localhost/matcha/public/api/user/verify/' . $data['vkey']);
 		} else {
 			$res['err'] = ['server' => 'Cant add user ..'];
 			$res['ok'] = false;
