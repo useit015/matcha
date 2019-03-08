@@ -41,10 +41,6 @@ html {
 	box-sizing: border-box;
 }
 
-body {
-	background: var(--color-red);
-}
-
 ::selection {
 	background-color: var(--color-primary);
 	color: var(--color-white);

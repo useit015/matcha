@@ -17,7 +17,7 @@
 				<v-text-field color="indigo" class="my-3" v-model="email" :rules="rules.email" label="E-mail" required ></v-text-field>
 				<v-text-field color="indigo" class="my-3" v-model="password" :counter="12" :rules="rules.password" label="Password" required :append-icon="showPass ? 'visibility' : 'visibility_off'" :type="showPass ? 'text' : 'password'" @click:append="showPass = !showPass"></v-text-field>
 				<v-text-field color="indigo" class="my-3" v-model="passwordConfirm" :counter="12" label="Confirm Password" required :append-icon="showConfPass ? 'visibility' : 'visibility_off'" :type="showConfPass ? 'text' : 'password'" @click:append="showConfPass = !showConfPass" :error-messages="passwordMatch()"></v-text-field>
-				<v-btn block large depressed color="indigo" dark @click="registerUser" class="mt-5">Submit</v-btn>
+				<v-btn block large depressed color="indigo" @click="registerUser" :disabled="!valid" class="mt-5 white--text">Submit</v-btn>
 				<v-layout row justify-end>
 					<v-btn flat color="indigo" dark to="/login">Have an account? Login</v-btn>
 				</v-layout>

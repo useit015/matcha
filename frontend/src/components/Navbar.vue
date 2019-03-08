@@ -22,7 +22,7 @@
 				<div v-if="isLoggedIn">
 					<v-list-tile avatar >
 						<v-list-tile-avatar>
-							<img src="https://randomuser.me/api/portraits/men/9.jpg">
+							<img src="../assets/handsome.jpeg">
 						</v-list-tile-avatar>
 						<v-list-tile-content>
 							<v-list-tile-title class="white--text text-capitalize font-weight-light subheading">{{ whoIsLoggedIn.username }}</v-list-tile-title>
