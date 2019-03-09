@@ -44,17 +44,20 @@ class User {
 
 	public function updateUser($data) {
 		$this->db->query('UPDATE users SET
-						first_name = :first_name,
-						last_name = :last_name,
-						username = :username,
-						email = :email,
-						gender = :gender,
-						sex_preference = :sex_preference,
-						biography = :biography,
-						tags = :tags,
-						`address` = :address,
-						phone = :phone
-					WHERE id = :id');
+							first_name = :first_name,
+							last_name = :last_name,
+							username = :username,
+							email = :email,
+							gender = :gender,
+							sex_preference = :sex_preference,
+							biography = :biography,
+							tags = :tags,
+							`address` = :address,
+							city = :city,
+							country = :country,
+							postal_code = :postal_code,
+							phone = :phone
+						WHERE id = :id');
 		return $this->db->execute($data);
 	}
 

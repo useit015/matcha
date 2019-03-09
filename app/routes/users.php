@@ -122,6 +122,9 @@ $app->post('/api/user/update/{id}', function(Request $req, Response $res) {
 		'biography' => $req->getParam('biography'),
 		'tags' => $req->getParam('tags'),
 		'address' => $req->getParam('address'),
+		'city' => $req->getParam('city'),
+		'country' => $req->getParam('country'),
+		'postal_code' => $req->getParam('postal_code'),
 		'phone' => $req->getParam('phone')
 	];
 	$res = [

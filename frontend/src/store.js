@@ -14,6 +14,8 @@ export const store = new Vuex.Store({
 		status: state => state.status
 	},
 	mutations: {
+		updateTags: (state, tags) => state.user.tags = tags.map(cur => cur.text.toLowerCase()).join(','),
+		updateUser: (state, user) => state.user = user,
 		logout: state => {
 			state.status = false
 			state.user = {}
@@ -21,9 +23,10 @@ export const store = new Vuex.Store({
 		login: (state, user) => {
 			state.status = true
 			state.user = user
-		}
+		},
 	},
 	actions: {
+		updateUser: (context, user) => context.commit('updateUser', user),
 		login:(context, user) => {
 			localStorage.setItem('token', user.token)
 			context.commit('login', user)
