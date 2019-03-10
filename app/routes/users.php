@@ -118,7 +118,7 @@ $app->post('/api/user/update/{id}', function(Request $req, Response $res) {
 		'username' => $req->getParam('username'),
 		'email' => $req->getParam('email'),
 		'gender' => $req->getParam('gender'),
-		'sex_preference' => $req->getParam('sex_preference'),
+		'looking' => $req->getParam('looking'),
 		'biography' => $req->getParam('biography'),
 		'tags' => $req->getParam('tags'),
 		'address' => $req->getParam('address'),

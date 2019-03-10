@@ -17,7 +17,7 @@
 				<v-btn flat color="grey" router to="/register">Sign Up</v-btn>
 			</div>
 		</v-toolbar>
-		<v-navigation-drawer v-model="drawer" app class="indigo">
+		<v-navigation-drawer v-model="drawer" app fixed class="indigo">
 			<v-list>
 				<div v-if="isLoggedIn">
 					<v-list-tile avatar >

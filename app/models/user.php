@@ -49,7 +49,7 @@ class User {
 							username = :username,
 							email = :email,
 							gender = :gender,
-							sex_preference = :sex_preference,
+							looking = :looking,
 							biography = :biography,
 							tags = :tags,
 							`address` = :address,
