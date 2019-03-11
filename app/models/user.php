@@ -50,6 +50,7 @@ class User {
 							email = :email,
 							gender = :gender,
 							looking = :looking,
+							birthdate = :birthdate,
 							biography = :biography,
 							tags = :tags,
 							`address` = :address,
@@ -80,6 +81,31 @@ class User {
 	public function isVerified($vkey) {
 		$this->db->query('SELECT verified FROM users WHERE vkey = ?');
 		return $this->db->single([$vkey]);
+	}
+
+	public function addImage($data) {
+		$this->db->query('INSERT INTO images
+							(`user_id`, `name`, `profile`)
+						VALUES
+							(:user_id, :name, :profile)');
+		return $this->db->execute($data);
+	}
+
+	public function uploadImage($file, $dir, $user) {
+		$name = $file['name'];
+		$tmpName = $file['tmp_name'];
+		$size = $file['size'];
+		$err = $file['err'];
+		$type = $file['type'];
+		$ext = strtolower(end(explode('.', $name)));
+		if (in_array($ext, ['jpg', 'jpeg', 'png']) && !$err && $size < 1000000) {
+			if (!file_exists($dir))
+				exec('mkdir -p '.$dir);
+			$dest = $user.'-'.uniqid('', true).'.'.$ext;
+			move_uploaded_file($tmpName, $dir.'/'.$dest);
+			return $dest;
+		} else
+			return false;
 	}
 
 }

@@ -2,12 +2,16 @@
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use Slim\Http\UploadedFile;
 
 $app = new \Slim\App([
 	'settings' => [
 		'displayErrorDetails' => true
 	]
 ]);
+$container = $app->getContainer();
+$container['upload_directory'] = dirname(dirname(__DIR__)) . '/uploads';
+
 
 $app->post('/api/user/login', function(Request $req, Response $res) {
 	$userModel = new User();
@@ -119,6 +123,7 @@ $app->post('/api/user/update/{id}', function(Request $req, Response $res) {
 		'email' => $req->getParam('email'),
 		'gender' => $req->getParam('gender'),
 		'looking' => $req->getParam('looking'),
+		'birthdate' => $req->getParam('birthdate'),
 		'biography' => $req->getParam('biography'),
 		'tags' => $req->getParam('tags'),
 		'address' => $req->getParam('address'),
@@ -142,6 +147,28 @@ $app->post('/api/user/update/{id}', function(Request $req, Response $res) {
 		$res['err'] = 'User not found';
 	}
 	echo json_encode($res);
+});
+
+$app->post('/api/user/image/{id}', function(Request $req, Response $res) {
+	$ret = [
+		'ok' => false,
+		'name' => ''
+	];
+	$userModel = new User();
+	$id = $req->getAttribute('id');
+	$dest = $userModel->uploadImage($_FILES['image'], $this->get('upload_directory'), $id);
+	if ($dest) {
+		$data = [
+			'user_id' => $id,
+			'name' => $dest,
+			'profile' => '0'
+		];
+		if ($userModel->addImage($data)) {
+			$ret['ok'] = true;
+			$ret['name'] = $dest;
+		}
+	}
+	return $res->withJson($ret);
 });
 
 $app->post('/api/user/delete/{id}', function(Request $req, Response $res) {

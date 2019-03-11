@@ -26,7 +26,10 @@ export const store = new Vuex.Store({
 		},
 	},
 	actions: {
-		updateUser: (context, user) => context.commit('updateUser', user),
+		updateUser: (context, user) => {
+			context.commit('updateUser', user)
+			// context.commit('updateTags', user)
+		},
 		login:(context, user) => {
 			localStorage.setItem('token', user.token)
 			context.commit('login', user)
