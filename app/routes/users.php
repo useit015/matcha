@@ -24,6 +24,7 @@ $app->post('/api/user/login', function(Request $req, Response $res) {
 			'tokenExpiration' => $loggedIn->tokenExpiration,
 			'id' => $loggedIn->id
 		]);
+		$loggedIn->images = $userModel->getUserImages($loggedIn->id);
 	}
 	return $res->withJson($loggedIn);
 });
@@ -39,6 +40,7 @@ $app->post('/api/user/isloggedin', function(Request $req, Response $res) {
 			'tokenExpiration' => $loggedIn->tokenExpiration,
 			'id' => $loggedIn->id
 		]);
+		$loggedIn->images = $userModel->getUserImages($loggedIn->id);
 	}
 	return $res->withJson($loggedIn);
 });
@@ -156,13 +158,16 @@ $app->post('/api/user/image/{id}', function(Request $req, Response $res) {
 	];
 	$userModel = new User();
 	$id = $req->getAttribute('id');
+	$isProfile = $req->getParam('profile');
 	$dest = $userModel->uploadImage($_FILES['image'], $this->get('upload_directory'), $id);
 	if ($dest) {
 		$data = [
 			'user_id' => $id,
 			'name' => $dest,
-			'profile' => '0'
+			'profile' => 0
 		];
+		if ($isProfile && $userModel->unsetProfile($id))
+			$data['profile'] = 1;
 		if ($userModel->addImage($data)) {
 			$ret['ok'] = true;
 			$ret['name'] = $dest;

@@ -7,6 +7,12 @@
 					<v-flex xs12 md4 class="avatar">
 						<v-avatar slot="offset" class="mx-auto d-block" size="200">
 							<img :src="profileImage" class="avatar__img">
+							<v-layout column justify-center align-center class="cropper" v-if="true">
+								<vue-avatar :width=200 :height=200 :border=0 ref="vueavatar" @vue-avatar-editor:image-ready="onImageReady"></vue-avatar>
+								<v-icon color="grey lighten-4" class="avatar__btn">add_a_photo</v-icon>
+								<vue-avatar-scale ref="vueavatarscale" @vue-avatar-editor-scale:change-scale="onChangeScale" :width=250 :min=1 :max=3 :step=0.02></vue-avatar-scale>
+								<v-btn flat color="indigo" @click="saveClicked">Click</v-btn>
+							</v-layout>
 						</v-avatar>
 					</v-flex>
 					<v-flex md8 class="hidden-sm-and-down">
@@ -45,13 +51,12 @@
 								<span class="ml-2">{{ `Born ${formatDate(user.birthdate, true)}` }}</span>
 							</p>
 							<v-form>
-								<input type="file" name="image" @change="onFileSelected">
-								<v-btn class="font-weight-light" color="indigo" dark @click.prevent="uploadImage">Upload image</v-btn>
+								<input type="file" name="image" ref="image" @change="onFileSelected" accept="image/*" class="d-none">
 							</v-form>
 						</v-container>
 					</v-flex>
 					<v-flex xs12 sm10 md8 class="main pa-0 grey--text">
-						<v-flex md8 class="hidden-md-and-up">
+						<v-flex md8 class="hidden-md-and-up pb-0">
 							<v-tabs fixed-tabs centered v-model="model" color="grey lighten-5" slider-color="indigo">
 								<v-tab href="#tab-profile">
 									<v-icon>person</v-icon>
@@ -118,18 +123,18 @@
 												<v-textarea color="indigo" label="Bio" v-model="user.biography"/>
 											</v-flex>
 											<v-flex xs12 text-xs-right>
-												<v-btn class="mx-0 font-weight-light" color="indigo" large block dark @click.prevent="updateUser">Update Profile</v-btn>
+												<v-btn class="mx-0 font-weight-light" color="indigo" large dark @click.prevent="updateUser">Save</v-btn>
 											</v-flex>
 										</v-layout>
 									</v-container>
 								</v-form>
 							</v-tab-item>
 							<v-tab-item value="tab-photo">
-								<v-container fluid grid-list-sm>
+								<v-container fluid grid-list-sm pt-0>
 									<h1 class="heading display-2 text-xs-center text-md-left font-weight-thin pt-4 pb-3 mb-4 hidden-sm-and-down">Pictures</h1>
 									<v-layout row wrap>
-										<v-flex v-for="i in 9" :key="i" xs4>
-											<img :src="`https://randomuser.me/api/portraits/men/${i + 40}.jpg`" class="image" alt="lorem" width="100%" height="100%">
+										<v-flex v-for="image in user.images" :key="image.id" xs4 grow>
+											<img :src="`http://localhost:80/matcha/uploads/${image.name}`" class="image" width="100%" height="100%">
 										</v-flex>
 									</v-layout>
 								</v-container>
@@ -144,27 +149,50 @@
 				</v-layout>
 			</v-container>
 		</div>
+		<v-snackbar v-model="alert.state" :color="alert.color" multi-line :timeout="4000" auto-height top right>
+			{{ alert.text }} 
+			<v-btn dark flat @click="alert.state = false">Close</v-btn>
+		</v-snackbar>
 	</v-layout>
 </template>
 
 <script>
 import { VueTagsInput, createTags } from '@johmun/vue-tags-input'
+import VueAvatar from './VueAvatar.vue'
+import VueAvatarScale from './VueAvatarScale.vue'
+
+const path = require('path')
 export default {
 	name: 'Settings',
-	components: { VueTagsInput },
+	components: {
+		VueTagsInput,
+		VueAvatar,
+		VueAvatarScale
+	},
 	data: () => ({
+		uploading: false,
+		tmpImage: '',
 		menu: false,
-		profileImage: '../assets/handsome.jpeg',
 		model: 'tab-profile',
 		tag: '',
 		tags: [],
 		genders: ['male', 'female'],
 		looking: ['male', 'female', 'both'],
-		selectedImage: null
+		selectedImage: null,
+		alert: {
+			state: false,
+			color: '',
+			text: ''
+		}
 	}),
 	computed: {
 		user() {
 			return { ...this.$store.getters.user }
+		},
+		profileImage() {
+			if (!this.uploading && this.user.images)
+				return `http://localhost:80/matcha/uploads/${this.$store.getters.profileImage}`
+			return this.tmpImage
 		}
 	},
 	watch: {
@@ -183,28 +211,66 @@ export default {
 		},
 		updateUser() {
 			this.$http.post(`http://localhost:80/matcha/public/api/user/update/${this.user.id}`, { ...this.user })
-				.then(res => res.body && res.body.ok ? this.$store.dispatch('updateUser', this.user) : 1)
-				.catch(err => console.error(err))
+				.then(res => {
+					if (res && res.body && res.body.ok) {
+						this.showAlert('success', 'You info has been updated successfuly')
+						this.$store.dispatch('updateUser', this.user)
+						this.uploading = false
+					}
+				}).catch(err => console.error(err))
+		},
+		pickFile() {
+			this.$refs.image.click()
 		},
 		onFileSelected(e) {
-			this.selectedImage = e.target.files[0]
-			const reader = new FileReader()
-			reader.onload = e => this.profileImage = e.target.result
-			reader.readAsDataURL(this.selectedImage)
+			if (e.target.files[0]) {
+				this.selectedImage = e.target.files[0]
+				if (this.selectedImage.name.lastIndexOf('.') <= 0) return
+				const reader = new FileReader()
+				reader.onload = e => this.tmpImage = e.target.result
+				reader.readAsDataURL(this.selectedImage)
+				this.uploading = true
+				// this.uploadImage()
+			}
 		},
 		uploadImage() {
 			const fd = new FormData()
 			fd.append('image', this.selectedImage, this.selectedImage.name)
+			fd.append('profile', 1)
 			this.$http.post(`http://localhost:80/matcha/public/api/user/image/${this.user.id}`, fd)
-				.then(res => res.body && res.body.ok ? this.$store.dispatch('updateUser', this.user) : 1)
-				.catch(err => console.error(err))
+				.then(res => {
+					if (res && res.body && res.body.ok) {
+						this.showAlert('success', 'You profile image has been updated successfuly')
+						this.$store.commit('updateProfileImage', res.body.name)
+						this.uploading = false
+					}
+				}).catch(err => console.error(err))
 		},
 		formatDate(date, long) {
 			if (!date) return ''
 			const d = new Date(date)
 			const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-			return long ? `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}` : `${months[d.getMonth()]} ${d.getFullYear()}`
-		}
+			if (long)
+				return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
+			return `${months[d.getMonth()]} ${d.getFullYear()}`
+		},
+		showAlert(color, text) {
+			this.alert = {
+				state: true,
+				color,
+				text
+			}
+		},
+			onChangeScale (scale) {
+				this.$refs.vueavatar.changeScale(scale)
+			},
+			saveClicked(){
+				const img = this.$refs.vueavatar.getImageScaled()
+				// use img
+			},
+			onImageReady(scale){
+				this.$refs.vueavatarscale.setScale(scale)
+			}
 	}
 }
 </script>
@@ -230,6 +296,25 @@ export default {
 
 .avatar {
 	transform: translateY(-8rem);
+	position: relative;
+}
+
+.avatar__btn {
+	position: absolute;
+	top: 100px;
+	left: 50%;
+	transform: translate(-50%, 150%) scale(0);
+	opacity: 0;
+	cursor: pointer;
+	transition: all .4s .1s ease;
+	font-size: 5rem;
+	line-height: 2rem;
+	pointer-events: none;
+}
+
+.editor:hover + .avatar__btn, .avatar__btn:hover {
+	transform: translate(-50%, -50%) scale(1);
+	opacity: 1;
 }
 
 .avatar__img {
@@ -245,8 +330,16 @@ export default {
 	margin-top: -2.75rem;
 }
 
+.flex.xs4.grow {
+	max-width: 100% !important;
+}
+
 .v-tabs__item--active, .v-tabs__item--active>.v-icon {
 	color: var(--color-primary) !important;
+}
+
+.v-snack__content {
+	padding: .75rem 1.5rem !important;
 }
 
 .vue-tags-input {
@@ -275,5 +368,12 @@ export default {
 .vue-tags-input .ti-input {
 	border: none;
 	border-bottom: 1px solid grey;
+}
+
+.cropper {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
 }
 </style>

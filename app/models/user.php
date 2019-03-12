@@ -83,6 +83,16 @@ class User {
 		return $this->db->single([$vkey]);
 	}
 
+	public function getUserImages($id) {
+		$this->db->query('SELECT * FROM images WHERE user_id = ?');
+		return $this->db->resultSet([$id]);
+	}
+
+	public function unsetProfile($id) {
+		$this->db->query('UPDATE images SET profile = 0 WHERE user_id = ?');
+		return $this->db->execute([$id]);
+	}
+
 	public function addImage($data) {
 		$this->db->query('INSERT INTO images
 							(`user_id`, `name`, `profile`)
@@ -98,7 +108,7 @@ class User {
 		$err = $file['err'];
 		$type = $file['type'];
 		$ext = strtolower(end(explode('.', $name)));
-		if (in_array($ext, ['jpg', 'jpeg', 'png']) && !$err && $size < 1000000) {
+		if (in_array($ext, ['jpg', 'jpeg', 'png']) && !$err && $size < 5000000) {
 			if (!file_exists($dir))
 				exec('mkdir -p '.$dir);
 			$dest = $user.'-'.uniqid('', true).'.'.$ext;

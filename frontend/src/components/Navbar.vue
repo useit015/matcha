@@ -22,7 +22,7 @@
 				<div v-if="isLoggedIn">
 					<v-list-tile avatar >
 						<v-list-tile-avatar>
-							<img src="../assets/handsome.jpeg">
+							<img :src="profileImage">
 						</v-list-tile-avatar>
 						<v-list-tile-content>
 							<v-list-tile-title class="white--text text-capitalize font-weight-light subheading">{{ whoIsLoggedIn.username }}</v-list-tile-title>
@@ -84,6 +84,9 @@ export default {
 		},
 		whoIsLoggedIn() {
 			return this.$store.getters.user;
+		},
+		profileImage() {
+			return `http://localhost:80/matcha/uploads/${this.$store.getters.profileImage}`
 		}
 	},
 	methods: {

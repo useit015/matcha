@@ -11,11 +11,16 @@ export const store = new Vuex.Store({
 	},
 	getters: {
 		user: state => state.user,
-		status: state => state.status
+		status: state => state.status,
+		profileImage: state => state.user.images.filter(cur => cur.profile == true)[0].name
 	},
 	mutations: {
 		updateTags: (state, tags) => state.user.tags = tags.map(cur => cur.text.toLowerCase()).join(','),
 		updateUser: (state, user) => state.user = user,
+		updateProfileImage: (state, image) => {
+			state.user.images.filter(cur => cur.profile == true).forEach(cur => cur.profile = 0)
+			state.user.images.push({ name: image, profile: 1 })
+		},
 		logout: state => {
 			state.status = false
 			state.user = {}
@@ -28,7 +33,6 @@ export const store = new Vuex.Store({
 	actions: {
 		updateUser: (context, user) => {
 			context.commit('updateUser', user)
-			// context.commit('updateTags', user)
 		},
 		login:(context, user) => {
 			localStorage.setItem('token', user.token)
