@@ -1,5 +1,5 @@
 <template>
-	<v-layout column class="settings">
+	<v-layout column class="settings pb-5 mb-5">
 		<div class="parallax"></div>
 		<v-layout class="py-0 strap grey lighten-3">
 			<v-container py-0>
@@ -7,12 +7,7 @@
 					<v-flex xs12 md4 class="avatar">
 						<v-avatar slot="offset" class="mx-auto d-block" size="200">
 							<img :src="profileImage" class="avatar__img">
-							<v-layout column justify-center align-center class="cropper" v-if="true">
-								<vue-avatar :width=200 :height=200 :border=0 ref="vueavatar" @vue-avatar-editor:image-ready="onImageReady"></vue-avatar>
-								<v-icon color="grey lighten-4" class="avatar__btn">add_a_photo</v-icon>
-								<vue-avatar-scale ref="vueavatarscale" @vue-avatar-editor-scale:change-scale="onChangeScale" :width=250 :min=1 :max=3 :step=0.02></vue-avatar-scale>
-								<v-btn flat color="indigo" @click="saveClicked">Click</v-btn>
-							</v-layout>
+							<v-icon color="grey lighten-4" class="avatar__btn" @click.stop="pickFile">add_a_photo</v-icon>
 						</v-avatar>
 					</v-flex>
 					<v-flex md8 class="hidden-sm-and-down">
@@ -50,9 +45,6 @@
 								<v-icon small>child_care</v-icon>
 								<span class="ml-2">{{ `Born ${formatDate(user.birthdate, true)}` }}</span>
 							</p>
-							<v-form>
-								<input type="file" name="image" ref="image" @change="onFileSelected" accept="image/*" class="d-none">
-							</v-form>
 						</v-container>
 					</v-flex>
 					<v-flex xs12 sm10 md8 class="main pa-0 grey--text">
@@ -153,6 +145,19 @@
 			{{ alert.text }} 
 			<v-btn dark flat @click="alert.state = false">Close</v-btn>
 		</v-snackbar>
+		<v-dialog v-model="dialog" max-width="500" persistent>
+			<v-card class="grey lighten-3">
+				<v-layout column align-center justify-center pt-4>
+					<vue-avatar :width=400 :height=400 :border=0 ref="vueavatar" @vue-avatar-editor:image-ready="onImageReady" class="mb-3"></vue-avatar>
+					<vue-avatar-scale ref="vueavatarscale" @vue-avatar-editor-scale:change-scale="onChangeScale" :width=250 :min=1 :max=3 :step=0.02></vue-avatar-scale>
+				</v-layout>
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn flat color="indigo" @click="dialog = false">Cancel</v-btn>
+					<v-btn flat color="indigo" @click="saveClicked">Save</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
 	</v-layout>
 </template>
 
@@ -170,6 +175,7 @@ export default {
 		VueAvatarScale
 	},
 	data: () => ({
+		dialog: false,
 		uploading: false,
 		tmpImage: '',
 		menu: false,
@@ -192,7 +198,6 @@ export default {
 		profileImage() {
 			if (!this.uploading && this.user.images)
 				return `http://localhost:80/matcha/uploads/${this.$store.getters.profileImage}`
-			return this.tmpImage
 		}
 	},
 	watch: {
@@ -220,22 +225,12 @@ export default {
 				}).catch(err => console.error(err))
 		},
 		pickFile() {
-			this.$refs.image.click()
+			this.$refs.vueavatar.clicked()
+			this.dialog = true
 		},
-		onFileSelected(e) {
-			if (e.target.files[0]) {
-				this.selectedImage = e.target.files[0]
-				if (this.selectedImage.name.lastIndexOf('.') <= 0) return
-				const reader = new FileReader()
-				reader.onload = e => this.tmpImage = e.target.result
-				reader.readAsDataURL(this.selectedImage)
-				this.uploading = true
-				// this.uploadImage()
-			}
-		},
-		uploadImage() {
+		uploadImage(data) {
 			const fd = new FormData()
-			fd.append('image', this.selectedImage, this.selectedImage.name)
+			fd.append('image', data)
 			fd.append('profile', 1)
 			this.$http.post(`http://localhost:80/matcha/public/api/user/image/${this.user.id}`, fd)
 				.then(res => {
@@ -261,16 +256,18 @@ export default {
 				text
 			}
 		},
-			onChangeScale (scale) {
-				this.$refs.vueavatar.changeScale(scale)
-			},
-			saveClicked(){
-				const img = this.$refs.vueavatar.getImageScaled()
-				// use img
-			},
-			onImageReady(scale){
-				this.$refs.vueavatarscale.setScale(scale)
-			}
+		onChangeScale (scale) {
+			this.$refs.vueavatar.changeScale(scale)
+		},
+		saveClicked(){
+			const img = this.$refs.vueavatar.getImageScaled().toDataURL()
+			this.uploadImage(img)
+			this.$refs.vueavatarscale.reset()
+			this.dialog = false
+		},
+		onImageReady(scale){
+			this.$refs.vueavatarscale.setScale(scale)
+		}
 	}
 }
 </script>
@@ -303,16 +300,14 @@ export default {
 	position: absolute;
 	top: 100px;
 	left: 50%;
-	transform: translate(-50%, 150%) scale(0);
+	transform: translate(-50%, 0) scale(0);
 	opacity: 0;
 	cursor: pointer;
 	transition: all .4s .1s ease;
 	font-size: 5rem;
-	line-height: 2rem;
-	pointer-events: none;
 }
 
-.editor:hover + .avatar__btn, .avatar__btn:hover {
+.avatar__img:hover + .avatar__btn, .avatar__btn:hover {
 	transform: translate(-50%, -50%) scale(1);
 	opacity: 1;
 }

@@ -115,7 +115,18 @@ class User {
 			move_uploaded_file($tmpName, $dir.'/'.$dest);
 			return $dest;
 		} else
-			return false;
+		return false;
+	}
+	
+	function saveImage64($data, $dir, $user){
+		list($type, $data) = explode(';', $data);
+		list(,$ext) = explode('/', $type);
+		list(,$data) = explode(',', $data);
+		if (!file_exists($dir))
+			exec('mkdir -p '.$dir);
+		$dest = $user.'-'.uniqid('', true).'.'.$ext;
+		file_put_contents($dir.'/'.$dest, base64_decode($data));
+		return $dest;
 	}
 
 }

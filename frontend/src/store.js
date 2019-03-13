@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
+import Vuex, { mapGetters } from 'vuex'
 
 Vue.use(Vuex)
 
@@ -12,7 +12,10 @@ export const store = new Vuex.Store({
 	getters: {
 		user: state => state.user,
 		status: state => state.status,
-		profileImage: state => state.user.images.filter(cur => cur.profile == true)[0].name
+		profileImage: state => {
+			const image = state.user.images.filter(cur => cur.profile == true)[0]
+			return image ? image.name : 'default.jpg'
+		}
 	},
 	mutations: {
 		updateTags: (state, tags) => state.user.tags = tags.map(cur => cur.text.toLowerCase()).join(','),

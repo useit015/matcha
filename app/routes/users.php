@@ -9,6 +9,7 @@ $app = new \Slim\App([
 		'displayErrorDetails' => true
 	]
 ]);
+
 $container = $app->getContainer();
 $container['upload_directory'] = dirname(dirname(__DIR__)) . '/uploads';
 
@@ -56,7 +57,7 @@ $app->get('/api/users', function(Request $req, Response $res) {
 
 $app->get('/api/user/{id}', function(Request $req, Response $res) {
 	$userModel = new User();
-	echo json_encode($userModel->getUser($req->getAttribute('id')));
+	return $res->withJson($userModel->getUser($req->getAttribute('id')));
 });
 
 $app->post('/api/user/add', function(Request $req, Response $res) {
@@ -75,7 +76,7 @@ $app->post('/api/user/add', function(Request $req, Response $res) {
 		'password' => $validator->validatePassword($data['password']),
 		'email' => $validator->validateEmail($data['email'])
 	];
-	$res = [
+	$state = [
 		'response' => $data,
 		'err' => '',
 		'ok' => true
@@ -85,34 +86,34 @@ $app->post('/api/user/add', function(Request $req, Response $res) {
 		if ($userModel->addUser($data)) {
 			mail($data['email'], 'Mail verification','http://localhost/matcha/public/api/user/verify/' . $data['vkey']);
 		} else {
-			$res['err'] = ['server' => 'Cant add user ..'];
+			$state['err'] = ['server' => 'Cant add user ..'];
 			$res['ok'] = false;
 		}
 	} else {
-		$res['err'] = $err;
-		$res['ok'] = false;
+		$state['err'] = $err;
+		$state['ok'] = false;
 	}
-	echo json_encode($res);
+	return $res->withJson($state);
 });
 
 $app->get('/api/user/verify/{vkey}', function(Request $req, Response $res) {
 	$userModel = new User();
 	$vkey = $req->getAttribute('vkey');
 	$row = $userModel->isVerified($vkey);
-	$res = ['ok' => true];
+	$state = ['ok' => true];
 	if ($row) {
 		if (!$userModel->verifyUser($vkey)) {
-			$res['ok'] = false;
+			$state['ok'] = false;
 			if ($row->verified == 1)
-				$res['err'] = 'Already verified';
+				$state['err'] = 'Already verified';
 			else
-				$res['err'] = 'Cant verify';
+				$state['err'] = 'Cant verify';
 		}
 	} else {
-		$res['ok'] = false;
-		$res['err'] = 'User not found';
+		$state['ok'] = false;
+		$state['err'] = 'User not found';
 	}
-	echo json_encode($res);
+	return $res->withJson($state);
 });
 
 $app->post('/api/user/update/{id}', function(Request $req, Response $res) {
@@ -134,32 +135,32 @@ $app->post('/api/user/update/{id}', function(Request $req, Response $res) {
 		'postal_code' => $req->getParam('postal_code'),
 		'phone' => $req->getParam('phone')
 	];
-	$res = [
+	$state = [
 		'response' => $data,
 		'err' => '',
 		'ok' => true
 	];
 	if ($userModel->isUser($data['id'])) {
 		if (!$userModel->updateUser($data)) {
-			$res['ok'] = false;
-			$res['err'] = 'Cant update';
+			$state['ok'] = false;
+			$state['err'] = 'Cant update';
 		}
 	} else {
-		$res['ok'] = false;
-		$res['err'] = 'User not found';
+		$state['ok'] = false;
+		$state['err'] = 'User not found';
 	}
-	echo json_encode($res);
+	return $res->withJson($state);
 });
 
 $app->post('/api/user/image/{id}', function(Request $req, Response $res) {
-	$ret = [
+	$state = [
 		'ok' => false,
 		'name' => ''
 	];
 	$userModel = new User();
 	$id = $req->getAttribute('id');
 	$isProfile = $req->getParam('profile');
-	$dest = $userModel->uploadImage($_FILES['image'], $this->get('upload_directory'), $id);
+	$dest = $userModel->saveImage64($_POST['image'], $this->get('upload_directory'), $id);
 	if ($dest) {
 		$data = [
 			'user_id' => $id,
@@ -169,11 +170,11 @@ $app->post('/api/user/image/{id}', function(Request $req, Response $res) {
 		if ($isProfile && $userModel->unsetProfile($id))
 			$data['profile'] = 1;
 		if ($userModel->addImage($data)) {
-			$ret['ok'] = true;
-			$ret['name'] = $dest;
+			$state['ok'] = true;
+			$state['name'] = $dest;
 		}
 	}
-	return $res->withJson($ret);
+	return $res->withJson($state);
 });
 
 $app->post('/api/user/delete/{id}', function(Request $req, Response $res) {
@@ -181,12 +182,12 @@ $app->post('/api/user/delete/{id}', function(Request $req, Response $res) {
 	$id = $req->getAttribute('id');
 	if ($userModel->isUser($id)) {
 		if (!$userModel->deleteUser($id)) {
-			$res['ok'] = false;
-			$res['err'] = 'Cant delete';
+			$state['ok'] = false;
+			$state['err'] = 'Cant delete';
 		}
 	} else {
-		$res['ok'] = false;
-		$res['err'] = 'User not found';
+		$state['ok'] = false;
+		$state['err'] = 'User not found';
 	}
-	echo json_encode($res);
+	return $res->withJson($state);
 });

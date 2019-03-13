@@ -19,22 +19,22 @@
 		</v-toolbar>
 		<v-navigation-drawer v-model="drawer" app fixed class="indigo">
 			<v-list>
-				<div v-if="isLoggedIn">
-					<v-list-tile avatar >
+				<v-list-tile avatar >
+					<v-layout align-center justify-center v-if="isLoggedIn">
 						<v-list-tile-avatar>
 							<img :src="profileImage">
 						</v-list-tile-avatar>
 						<v-list-tile-content>
 							<v-list-tile-title class="white--text text-capitalize font-weight-light subheading">{{ whoIsLoggedIn.username }}</v-list-tile-title>
 						</v-list-tile-content>
-						<v-list-tile-action>
-							<v-btn icon @click.stop="drawer = !drawer">
-								<v-icon class="white--text">chevron_left</v-icon>
-							</v-btn>
-						</v-list-tile-action>
-					</v-list-tile>
-					<v-divider></v-divider>
-				</div>
+					</v-layout>
+					<v-list-tile-action class="ml-auto">
+						<v-btn icon @click.stop="drawer = !drawer" class="ml-auto">
+							<v-icon class="white--text">chevron_left</v-icon>
+						</v-btn>
+					</v-list-tile-action>
+				</v-list-tile>
+				<v-divider></v-divider>
 				<v-list-tile v-for="link in links" :key="link.text" router :to="link.route" >
 					<v-list-tile-action v-if="link.public || isLoggedIn">
 						<v-icon class="white--text">{{ link.icon }}</v-icon>
@@ -71,8 +71,9 @@ export default {
 		}
 	},
 	created: function() {
-		this.$http.post('http://localhost:80/matcha/public/api/user/isloggedin', { token: localStorage.getItem("token") })
-			.then(res => {
+		this.$http.post('http://localhost:80/matcha/public/api/user/isloggedin', {
+				token: localStorage.getItem("token")
+			}).then(res => {
 				if (res.body.tokenExpiration && Date.parse(res.body.tokenExpiration) >= Date.now()) {
 					this.$store.dispatch('login', res.body)
 				}
