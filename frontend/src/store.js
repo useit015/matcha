@@ -13,6 +13,7 @@ export const store = new Vuex.Store({
 		user: state => state.user,
 		status: state => state.status,
 		profileImage: state => {
+			if (!state.user.images) return ''
 			const image = state.user.images.filter(cur => cur.profile == true)[0]
 			return image ? image.name : 'default.jpg'
 		}

@@ -1,5 +1,5 @@
 <template>
-	<v-app class="grey lighten-5">
+	<v-app class="grey lighten-5 app">
 		<Navbar/>
 		<v-content>
 			<router-view></router-view>
@@ -49,5 +49,9 @@ html {
 ::selection {
 	background-color: var(--color-primary);
 	color: var(--color-white);
+}
+
+.app {
+	overflow-x: hidden;
 }
 </style>

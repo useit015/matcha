@@ -4,6 +4,9 @@
 
 <script >
 export default {
+	data: function() {
+		return { scale: 1 }
+	},
 	props: {
 		min:	{ type: Number, default: 1 },
 		max:	{ type: Number, default: 2 },
@@ -16,11 +19,10 @@ export default {
 		zoomIn: function() { this.scale += 0.1 },
 		reset: function() { this.scale = this.min }
 	},
-	data: function() {
-		return { scale: 1 }
-	},
 	watch: {
-		scale: function() { this.$emit('vue-avatar-editor-scale:change-scale', this.scale) }
+		scale: function() {
+			this.$emit('vue-avatar-editor-scale:change-scale', this.scale)
+		}
 	}
 }
 </script>

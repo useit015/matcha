@@ -62,7 +62,6 @@ export default {
 	data () {
 		return {
 			drawer: false,
-			mini: false,
 			links: [
 				{ icon: 'dashboard', text: 'Home', route: '/', public: true },
 				{ icon: 'folder', text: 'About', route: '/about', public: true },
@@ -99,7 +98,3 @@ export default {
 	}
 }
 </script>
-
-<style scoped>
-
-</style>
