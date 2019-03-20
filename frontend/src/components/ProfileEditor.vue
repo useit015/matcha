@@ -7,7 +7,7 @@
 			</v-layout>
 			<v-card-actions>
 				<v-spacer></v-spacer>
-				<v-btn flat color="indigo" @click="dialog = false">Cancel</v-btn>
+				<v-btn flat color="indigo" @click="closeEditor">Cancel</v-btn>
 				<v-btn flat color="indigo" @click="saveClicked">Save</v-btn>
 			</v-card-actions>
 		</v-card>
@@ -32,14 +32,17 @@ export default {
 	props: {
 		user: {
 			type: Object,
-			default: function() { return {} }
+			default: function() {
+				return {}
+			}
 		}
-	},
-	watch: {
-
 	},
 	methods: {
 		...utility,
+		closeEditor() {
+			this.dialog = false
+			this.$refs.vueavatar.init()
+		},
 		pickFile() {
 			this.$refs.vueavatar.clicked()
 			this.dialog = true
@@ -48,8 +51,7 @@ export default {
 			this.$refs.vueavatar.changeScale(scale)
 		},
 		saveClicked(){
-			const img = this.$refs.vueavatar.getImageScaled().toDataURL()
-			this.$emit('update-image', img)
+			this.$emit('update-image', this.$refs.vueavatar.getImageScaled().toDataURL())
 			this.$refs.vueavatarscale.reset()
 			this.dialog = false
 		},
@@ -59,7 +61,3 @@ export default {
 	}
 }
 </script>
-
-<style>
-
-</style>

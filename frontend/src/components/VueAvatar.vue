@@ -1,6 +1,6 @@
 <template>
 	<div class="editor">
-		<canvas :width="canvasWidth" :height="canvasHeight" ref="canvas" @dragover.prevent @drop="onDrop" @mousedown="onDragStart" @mouseup="onDragEnd" @mousemove="onMouseMove" @click="clicked" v-bind:class="cursor"></canvas>
+		<canvas id="canvas__editor" :width="canvasWidth" :height="canvasHeight" ref="canvas" @dragover.prevent @drop="onDrop" @mousedown="onDragStart" @mouseup="onDragEnd" @mousemove="onMouseMove" @click="clicked" v-bind:class="cursor"></canvas>
 		<input type="file" id='profileInput' @change="fileSelected" accept="image/*" class="d-none">
 	</div>
 </template>
@@ -66,10 +66,14 @@ export default {
 		this.init()
 	},
 	methods: {
+		clearCanvas: function() {
+			this.context.clearRect(0, 0, this.width, this.height)
+		},
 		init: function() {
 			this.canvas = this.$refs.canvas
 			this.context = this.canvas.getContext('2d')
 			this.paint()
+			this.clearCanvas()
 			if(!this.image) {
 				var placeHolder = this.svgToImage(this.context, '<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 65"><defs><style>.cls-1{fill:#999;}</style></defs><title>Upload_Upload</title><path class="cls-1" d="M32.5,1A31.5,31.5,0,1,1,1,32.5,31.54,31.54,0,0,1,32.5,1m0-1A32.5,32.5,0,1,0,65,32.5,32.5,32.5,0,0,0,32.5,0h0Z"/><polygon class="cls-1" points="41.91 28.2 32.59 18.65 23.09 28.39 24.17 29.44 31.87 21.54 31.87 40.05 33.37 40.05 33.37 21.59 40.83 29.25 41.91 28.2"/><polygon class="cls-1" points="40.66 40.35 40.66 44.35 24.34 44.35 24.34 40.35 22.34 40.35 22.34 44.35 22.34 46.35 24.34 46.35 40.66 46.35 42.66 46.35 42.66 44.35 42.66 40.35 40.66 40.35"/></svg>');
 				var self = this;
@@ -77,7 +81,6 @@ export default {
 					var dim = self.getDimensions()
 					var x = self.canvasWidth / 2 - this.width / 2
 					var y = self.canvasHeight / 2 - this.height / 2
-					self.context.clearRect(0, 0, self.canvasWidth, self.canvasHeight)
 					self.context.drawImage(placeHolder, x, y, this.width, this.height);
 				}
 			} else {

@@ -1,12 +1,12 @@
 <template>
-	<v-flex md8 :class="mobile ? 'hidden-md-and-up pb-0 mt-5' : 'hidden-sm-and-down'">
-		<v-tabs fixed-tabs centered v-model="activeTab" :color="`grey lighten-${mobile ? 5 : 3}`" slider-color="indigo">
-			<v-tab v-for="link in links" :key="link.route" :href="`#tab-${link.route}`">
-				<v-icon :left="!mobile">{{ link.icon }}</v-icon>
-				<span :class="mobile ? 'pl-3 hidden-xs-only' : ''">{{ link.text }}</span>
-			</v-tab>
-		</v-tabs>
-	</v-flex>
+<v-flex md8 :class="mobile ? 'hidden-md-and-up pb-0 mt-5' : 'hidden-sm-and-down'">
+	<v-tabs fixed-tabs centered v-model="activeTab" :color="`grey lighten-${mobile ? 5 : 3}`" slider-color="indigo">
+		<v-tab v-for="link in links" :key="link.route" :href="`#tab-${link.route}`">
+			<v-icon :left="!mobile">{{ link.icon }}</v-icon>
+			<span :class="mobile ? 'pl-3 hidden-xs-only' : ''">{{ link.text }}</span>
+		</v-tab>
+	</v-tabs>
+</v-flex>
 </template>
 
 <script>

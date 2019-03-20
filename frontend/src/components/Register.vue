@@ -1,29 +1,29 @@
 <template>
-	<v-container class="mt-4">
-		<transition name="alert">
-			<v-alert v-if="userFailed" :value="true" dismissible type="error" color="error" icon="warning" transition="scale-transition" class="alert">
-				Oups .. something went wrong !
-			</v-alert>
-			<v-alert v-if="userAdded" :value="true" dismissible type="success" color="success" icon="check_circle" transition="scale-transition" class="alert">
-				You have been successfully registered, please verify your email
-			</v-alert>
-		</transition>
-		<div class="register mt-5">
-			<h1 class="page-header display-3 mb-4 font-weight-light grey--text">Register</h1>
-			<v-form v-model="valid" class="my-4">
-				<v-text-field color="indigo" class="my-3" v-model="firstname" :rules="rules.name" label="First name" required ></v-text-field>
-				<v-text-field color="indigo" class="my-3" v-model="lastname" :rules="rules.name" label="Last name" required ></v-text-field>
-				<v-text-field color="indigo" class="my-3" v-model="username" :rules="rules.username" :counter="10" label="Username" required ></v-text-field>
-				<v-text-field color="indigo" class="my-3" v-model="email" :rules="rules.email" label="E-mail" required ></v-text-field>
-				<v-text-field color="indigo" class="my-3" v-model="password" :counter="12" :rules="rules.password" label="Password" required :append-icon="showPass ? 'visibility' : 'visibility_off'" :type="showPass ? 'text' : 'password'" @click:append="showPass = !showPass"></v-text-field>
-				<v-text-field color="indigo" class="my-3" v-model="passwordConfirm" :counter="12" label="Confirm Password" required :append-icon="showConfPass ? 'visibility' : 'visibility_off'" :type="showConfPass ? 'text' : 'password'" @click:append="showConfPass = !showConfPass" :error-messages="passwordMatch()"></v-text-field>
-				<v-btn block large depressed color="indigo" @click="registerUser" :disabled="!valid" class="mt-5 white--text">Submit</v-btn>
-				<v-layout row justify-end>
-					<v-btn flat color="indigo" dark to="/login">Have an account? Login</v-btn>
-				</v-layout>
-			</v-form>
-		</div>
-	</v-container>
+<v-container class="mt-4">
+	<transition name="alert">
+		<v-alert v-if="userFailed" :value="true" dismissible type="error" color="error" icon="warning" transition="scale-transition" class="alert">
+			Oups .. something went wrong !
+		</v-alert>
+		<v-alert v-if="userAdded" :value="true" dismissible type="success" color="success" icon="check_circle" transition="scale-transition" class="alert">
+			You have been successfully registered, please verify your email
+		</v-alert>
+	</transition>
+	<div class="register mt-5">
+		<h1 class="page-header display-3 mb-4 font-weight-light grey--text">Register</h1>
+		<v-form v-model="valid" class="my-4">
+			<v-text-field color="indigo" class="my-3" v-model="firstname" :rules="rules.name" label="First name" required ></v-text-field>
+			<v-text-field color="indigo" class="my-3" v-model="lastname" :rules="rules.name" label="Last name" required ></v-text-field>
+			<v-text-field color="indigo" class="my-3" v-model="username" :rules="rules.username" :counter="10" label="Username" required ></v-text-field>
+			<v-text-field color="indigo" class="my-3" v-model="email" :rules="rules.email" label="E-mail" required ></v-text-field>
+			<v-text-field color="indigo" class="my-3" v-model="password" :counter="12" :rules="rules.password" label="Password" required :append-icon="showPass ? 'visibility' : 'visibility_off'" :type="showPass ? 'text' : 'password'" @click:append="showPass = !showPass"></v-text-field>
+			<v-text-field color="indigo" class="my-3" v-model="passwordConfirm" :counter="12" label="Confirm Password" required :append-icon="showConfPass ? 'visibility' : 'visibility_off'" :type="showConfPass ? 'text' : 'password'" @click:append="showConfPass = !showConfPass" :error-messages="passwordMatch()"></v-text-field>
+			<v-btn block large depressed color="indigo" @click="registerUser" :disabled="!valid" class="mt-5 white--text">Submit</v-btn>
+			<v-layout row justify-end>
+				<v-btn flat color="indigo" dark to="/login">Have an account? Login</v-btn>
+			</v-layout>
+		</v-form>
+	</div>
+</v-container>
 </template>
 
 <script>

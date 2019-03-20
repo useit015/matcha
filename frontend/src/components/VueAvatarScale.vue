@@ -1,5 +1,5 @@
 <template>
-	<v-slider v-model="scale" append-icon="zoom_in" prepend-icon="zoom_out" @click:append="zoomIn" @click:prepend="zoomOut" :min="min" :max="max" :step="step" :style="{ width: width +'px'}"></v-slider>
+<v-slider v-model="scale" append-icon="zoom_in" prepend-icon="zoom_out" @click:append="zoomIn" @click:prepend="zoomOut" :min="min" :max="max" :step="step" :style="{ width: width +'px'}"></v-slider>
 </template>
 
 <script >

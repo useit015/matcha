@@ -20,18 +20,16 @@
 import utility from '../utility.js'
 export default {
 	name: 'ProfileBadge',
-	data() {
-		return {}
-	},
 	props: {
-		user: { type: Object, default: function() { return {} } }
+		user: {
+			type: Object,
+			default: function() {
+				return {}
+			}
+		}
 	},
 	methods: {
 		...utility
 	}
 }
 </script>
-
-<style>
-
-</style>

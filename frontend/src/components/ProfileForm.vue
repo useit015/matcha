@@ -1,58 +1,58 @@
 <template>
-	<v-container>
-		<h1 class="heading display-2 text-xs-center text-md-left font-weight-thin pt-4 pb-3 mb-4 hidden-sm-and-down">Account Informations</h1>
-		<v-form class="mt-4">
-			<v-layout wrap>
-				<v-flex xs12>
-					<v-text-field color="indigo" label="Username" v-model="user.username"/>
-				</v-flex>
-				<v-flex xs12 sm6>
-					<v-text-field label="First Name" color="indigo" v-model="user.first_name"/>
-				</v-flex>
-				<v-flex xs12 sm6>
-					<v-text-field label="Last Name" color="indigo" v-model="user.last_name"/>
-				</v-flex>
-				<v-flex xs12 sm6>
-					<v-text-field label="Phone Number" color="indigo" v-model="user.phone"/>
-				</v-flex>
-				<v-flex xs12 sm6>
-					<v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
-						<template v-slot:activator="{ on }">
-							<v-text-field color="indigo" :value="formatDate(user.birthdate, true)" label="Birth Date" readonly v-on="on"></v-text-field>
-						</template>
-						<v-date-picker color="indigo" v-model="user.birthdate" @input="menu = false"></v-date-picker>
-					</v-menu>
-				</v-flex>
-				<v-flex xs12 sm6>
-					<v-select color="indigo" :items="genders" label="Gender" v-model="user.gender"></v-select>
-				</v-flex>
-				<v-flex xs12 sm6>
-					<v-select color="indigo" :items="looking" label="Looking For" v-model="user.looking"></v-select>
-				</v-flex>
-				<v-flex xs12>
-					<v-text-field label="Address" color="indigo" v-model="user.address"/>
-				</v-flex>
-				<v-flex xs12 sm4>
-					<v-text-field label="City" color="indigo" v-model="user.city"/>
-				</v-flex>
-				<v-flex xs12 sm4>
-					<v-text-field label="Country" color="indigo" v-model="user.country"/>
-				</v-flex>
-				<v-flex xs12 sm4>
-					<v-text-field color="indigo" label="Postal Code" type="number" v-model="user.postal_code"/>
-				</v-flex>
-				<v-flex xs12>
-					<vue-tags-input v-model="tag" :tags="tags" @tags-changed="newTags => tags = newTags"/>
-				</v-flex>
-				<v-flex xs12>
-					<v-textarea color="indigo" label="Bio" v-model="user.biography"/>
-				</v-flex>
-				<v-flex xs12 text-xs-right>
-					<v-btn class="mx-0 font-weight-light" color="indigo" large dark @click.prevent="updateUser">Save</v-btn>
-				</v-flex>
-			</v-layout>
-		</v-form>
-	</v-container>
+<v-container>
+	<h1 class="heading display-2 text-xs-center text-md-left font-weight-thin pt-4 pb-3 mb-4 hidden-sm-and-down">Account Informations</h1>
+	<v-form class="mt-4">
+		<v-layout wrap>
+			<v-flex xs12>
+				<v-text-field color="indigo" label="Username" v-model="user.username"/>
+			</v-flex>
+			<v-flex xs12 sm6>
+				<v-text-field label="First Name" color="indigo" v-model="user.first_name"/>
+			</v-flex>
+			<v-flex xs12 sm6>
+				<v-text-field label="Last Name" color="indigo" v-model="user.last_name"/>
+			</v-flex>
+			<v-flex xs12 sm6>
+				<v-text-field label="Phone Number" color="indigo" v-model="user.phone"/>
+			</v-flex>
+			<v-flex xs12 sm6>
+				<v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
+					<template v-slot:activator="{ on }">
+						<v-text-field color="indigo" :value="formatDate(user.birthdate, true)" label="Birth Date" readonly v-on="on"></v-text-field>
+					</template>
+					<v-date-picker color="indigo" v-model="user.birthdate" @input="menu = false"></v-date-picker>
+				</v-menu>
+			</v-flex>
+			<v-flex xs12 sm6>
+				<v-select color="indigo" :items="genders" label="Gender" v-model="user.gender"></v-select>
+			</v-flex>
+			<v-flex xs12 sm6>
+				<v-select color="indigo" :items="looking" label="Looking For" v-model="user.looking"></v-select>
+			</v-flex>
+			<v-flex xs12>
+				<v-text-field label="Address" color="indigo" v-model="user.address"/>
+			</v-flex>
+			<v-flex xs12 sm4>
+				<v-text-field label="City" color="indigo" v-model="user.city"/>
+			</v-flex>
+			<v-flex xs12 sm4>
+				<v-text-field label="Country" color="indigo" v-model="user.country"/>
+			</v-flex>
+			<v-flex xs12 sm4>
+				<v-text-field color="indigo" label="Postal Code" type="number" v-model="user.postal_code"/>
+			</v-flex>
+			<v-flex xs12>
+				<vue-tags-input v-model="tag" :tags="tags" @tags-changed="newTags => tags = newTags"/>
+			</v-flex>
+			<v-flex xs12>
+				<v-textarea color="indigo" label="Bio" v-model="user.biography"/>
+			</v-flex>
+			<v-flex xs12 text-xs-right>
+				<v-btn class="mx-0 font-weight-light" color="indigo" large dark @click.prevent="updateUser">Save</v-btn>
+			</v-flex>
+		</v-layout>
+	</v-form>
+</v-container>
 </template>
 
 <script>
