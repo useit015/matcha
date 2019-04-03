@@ -7,7 +7,13 @@
 				<v-flex xs12 sm8 md4 class="avatar">
 					<v-avatar slot="offset" class="mx-auto d-block" size="200">
 						<img :src="profileImage" class="avatar__img">
-						<v-icon color="grey lighten-4" class="avatar__btn" @click.stop="openEditor">add_a_photo</v-icon>
+						<div class="avatar__btn">
+							<v-fab-transition>
+								<v-btn color="grey lighten-5" fab small @click.stop="openEditor">
+									<v-icon>add_a_photo</v-icon>
+								</v-btn>
+							</v-fab-transition>
+						</div>
 					</v-avatar>
 				</v-flex>
 				<profile-tabs :active="activeTab" @change-tab="changeTab"></profile-tabs>
@@ -148,19 +154,13 @@ export default {
 
 .avatar__btn {
 	position: absolute;
-	top: 100px;
-	left: 50%;
-	transform: translate(-50%, 0) scale(0);
-	opacity: 0;
-	cursor: pointer;
-	transition: all .4s .1s ease;
-	font-size: 5rem;
+	top: 85%;
+	left: 85%;
+	transform: translate(-50%, -50%) scale(.95);
 }
 
-.avatar__img:hover+.avatar__btn,
-.avatar__btn:hover {
-	transform: translate(-50%, -50%) scale(1);
-	opacity: 1;
+.avatar__btn > .v-btn--floating:not(.v-btn--depressed):not(.v-btn--flat) {
+	box-shadow: 0 0 3px rgba(0, 0, 0, .2) inset;
 }
 
 .avatar__img {
